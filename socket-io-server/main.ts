@@ -11,7 +11,11 @@ const io = new Server<
     ServerToClientEvents,
     InterServerEvents,
     SocketData
->(server);
+>(server, {
+    cors: {
+        origin: "http://localhost:5173"
+    }
+});
 
 
 app.get('/', (req: Request, res: Response) => {

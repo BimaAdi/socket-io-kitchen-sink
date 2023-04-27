@@ -1,36 +1,15 @@
 import { useEffect, useState } from "react";
 import User from "./components/User";
 import "./App.css";
-import { Socket, io } from "socket.io-client";
-// import SocketHook from './hooks/SocketHook'
+import UseSocketIO from "./hooks/UseSocketIO";
 
-const URL = "http://127.0.0.1:3000";
 function App() {
   const [chat, setChat] = useState<string>("");
+  const {isConnect} = UseSocketIO();
 
   useEffect(() => {
-    const socket: Socket<any, any> = io(URL, {
-      autoConnect: false,
-      transports: ["websocket"],
-    });
-    socket.connect();
-
-    function onConnect() {
-      console.log("connected");
-    }
-
-    function onDisconnect() {
-      console.log("disconected");
-    }
-
-    socket.on("connect", onConnect);
-    socket.on("disconnect", onDisconnect);
-
-    return () => {
-      socket.off("connect", onConnect);
-      socket.off("disconnect", onDisconnect);
-    };
-  }, []);
+    console.log(isConnect);
+  }, [isConnect]);
 
   return (
     <>
