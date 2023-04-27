@@ -1,33 +1,38 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
+import { useEffect, useState } from 'react'
+import User from './components/User'
 import './App.css'
+import socket from './hooks/socket'
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [chat, setChat] = useState<string>("")
+  
+  useEffect(() => {
+    socket()
+  }, [])
 
   return (
     <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+      <h1>Socket IO kitchen sink</h1>
+      <div className='main'>
+        <div className='command'>
+          <h2>Command</h2>
+          <div className='bordered' style={{ marginBottom: '10px' }}>
+            <button>Add New User</button>
+          </div>
+          <div className='bordered' style={{ marginBottom: '10px' }}>
+            <input placeholder='message' type="text" value={chat} onChange={(e) => setChat(e.target.value)} />
+            <button>Broadcast</button>
+          </div>
+        </div>
+        <div className='users'>
+          <h2>Users</h2>
+          <div className="users-grid">
+            <User socketId='abcdefg' message=''/>
+            <User socketId='abcdefg' message=''/>
+            <User socketId='abcdefg' message=''/>
+          </div>
+        </div>
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
     </>
   )
 }
