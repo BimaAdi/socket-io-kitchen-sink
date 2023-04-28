@@ -23,7 +23,8 @@ app.get('/', (req: Request, res: Response) => {
 });
 
 io.on('connection', (socket) => {
-    console.log('a user connected');
+    console.log(`a user connected with socket id ${socket.id}`);
+    socket.emit("socketid", socket.id)
 });
 
 server.listen(3000, () => {

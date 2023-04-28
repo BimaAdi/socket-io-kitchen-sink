@@ -1,15 +1,27 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { Socket, io } from "socket.io-client";
+import { ServerToClientEvents, ClientToServerEvents } from "../types/socketio";
 
 const URL = "http://localhost:3000";
-const UseSocketIO = () => {
+const UseSocketIO = ({
+  autoConnect = true,
+}: {
+  autoConnect?: boolean | undefined;
+}) => {
   const [isConnect, setIsConnect] = useState<boolean>(false);
+  const [socketId, setSocketId] = useState<string>("");
+  const socket = useRef<Socket<
+    ServerToClientEvents,
+    ClientToServerEvents
+  > | null>(null);
 
   useEffect(() => {
-    const socket: Socket<any, any> = io(URL, {
+    socket.current = io(URL, {
       autoConnect: false,
     });
-    socket.connect();
+    if (autoConnect === true) {
+      socket.current.connect();
+    }
 
     function onConnect() {
       console.log("connected");
@@ -20,16 +32,24 @@ const UseSocketIO = () => {
       console.log("disconected");
     }
 
-    socket.on("connect", onConnect);
-    socket.on("disconnect", onDisconnect);
+    function onSocketId(a: string) {
+      setSocketId(a);
+    }
+
+    socket.current.on("connect", onConnect);
+    socket.current.on("disconnect", onDisconnect);
+    socket.current.on("socketid", onSocketId);
 
     return () => {
-      socket.off("connect", onConnect);
-      socket.off("disconnect", onDisconnect);
+      if (socket.current !== null) {
+        socket.current.off("connect", onConnect);
+        socket.current.off("disconnect", onDisconnect);
+        socket.current.off("socketid", onSocketId);
+      }
     };
-  }, []);
+  }, [autoConnect]);
 
-  return { isConnect };
+  return { isConnect, socketId, socket };
 };
 
 export default UseSocketIO;

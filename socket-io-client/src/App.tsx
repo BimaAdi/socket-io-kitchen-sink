@@ -1,15 +1,19 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import { v4 as uuidv4 } from "uuid";
 import User from "./components/User";
 import "./App.css";
-import UseSocketIO from "./hooks/UseSocketIO";
 
 function App() {
   const [chat, setChat] = useState<string>("");
-  const {isConnect} = UseSocketIO();
+  const [users, setUsers] = useState<{ key: string }[]>([]);
 
-  useEffect(() => {
-    console.log(isConnect);
-  }, [isConnect]);
+  const addNewUser = () => {
+    setUsers([...users, { key: uuidv4() }]);
+  };
+
+  const removeUser = (key: string) => {
+    setUsers(users.filter((x) => key !== x.key));
+  };
 
   return (
     <>
@@ -18,7 +22,7 @@ function App() {
         <div className="command">
           <h2>Command</h2>
           <div className="bordered" style={{ marginBottom: "10px" }}>
-            <button>Add New User</button>
+            <button onClick={addNewUser}>Add New User</button>
           </div>
           <div className="bordered" style={{ marginBottom: "10px" }}>
             <input
@@ -33,9 +37,9 @@ function App() {
         <div className="users">
           <h2>Users</h2>
           <div className="users-grid">
-            <User socketId="abcdefg" message="" />
-            <User socketId="abcdefg" message="" />
-            <User socketId="abcdefg" message="" />
+            {users.map((x) => {
+              return <User id={x.key} removeUser={removeUser} key={x.key} />;
+            })}
           </div>
         </div>
       </div>
