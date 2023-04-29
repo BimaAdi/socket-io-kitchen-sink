@@ -5,8 +5,10 @@ import "./App.css";
 import { API_URL } from "./constants";
 
 function App() {
-  const [chatBroadcast, setChatBroadcast] = useState<string>("");
   const [users, setUsers] = useState<{ key: string }[]>([]);
+  const [chatBroadcast, setChatBroadcast] = useState<string>("");
+  const [inputSocketId, setInputSocketId] = useState<string>("");
+  const [chatSocketId, setChatSocketId] = useState<string>("");
 
   const addNewUser = () => {
     setUsers([...users, { key: uuidv4() }]);
@@ -23,6 +25,21 @@ function App() {
         "Content-type": "application/json",
       },
       body: JSON.stringify({
+        message,
+      }),
+    });
+
+    console.log(res.json());
+  };
+
+  const toSocketIdMessage = async (socket_id: string, message: string) => {
+    const res = await fetch(`${API_URL}/api/to-socket-id/`, {
+      method: "POST",
+      headers: {
+        "Content-type": "application/json",
+      },
+      body: JSON.stringify({
+        socket_id,
         message,
       }),
     });
@@ -48,6 +65,23 @@ function App() {
             />
             <button onClick={() => broadcastMessage(chatBroadcast)}>
               Broadcast
+            </button>
+          </div>
+          <div className="bordered" style={{ marginBottom: "10px" }}>
+            <input
+              placeholder="message"
+              type="text"
+              value={chatSocketId}
+              onChange={(e) => setChatSocketId(e.target.value)}
+            />
+            <input
+              placeholder="socketId"
+              type="text"
+              value={inputSocketId}
+              onChange={(e) => setInputSocketId(e.target.value)}
+            />
+            <button onClick={() => toSocketIdMessage(inputSocketId, chatSocketId)}>
+              toSocketId
             </button>
           </div>
         </div>

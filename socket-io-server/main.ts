@@ -9,7 +9,11 @@ import {
   InterServerEvents,
   SocketData,
 } from "./types/socketio";
-import { BroadcastMessageValidator } from "./validators";
+import { SocketTypes } from "./types/sockettypes";
+import {
+  BroadcastMessageValidator,
+  ToSocketIdMessageValidator,
+} from "./validators";
 
 const app: Express = express();
 const server = http.createServer(app);
@@ -40,12 +44,7 @@ app.get("/api/", (req: Request, res: Response) => {
 });
 
 app.post("/api/broadcast/", (req: Request, res: Response) => {
-  let io = req.app.get("io") as Socket<
-    ClientToServerEvents,
-    ServerToClientEvents,
-    InterServerEvents,
-    SocketData
-  >;
+  let io = req.app.get("io") as SocketTypes;
 
   try {
     const validate = BroadcastMessageValidator.safeParse(req.body);
@@ -53,6 +52,21 @@ app.post("/api/broadcast/", (req: Request, res: Response) => {
       return res.status(400).json({ message: validate.error });
     }
     io.local.emit("message", validate.data.message);
+    return res.status(200).json({ message: "Ok" });
+  } catch (err) {
+    return res.status(500).json({ error: err });
+  }
+});
+
+app.post("/api/to-socket-id/", (req: Request, res: Response) => {
+  let io = req.app.get("io") as SocketTypes;
+
+  try {
+    const validate = ToSocketIdMessageValidator.safeParse(req.body);
+    if (validate.success === false) {
+      return res.status(400).json({ message: validate.error });
+    }
+    io.to(validate.data.socket_id).emit("message", validate.data.message);
     return res.status(200).json({ message: "Ok" });
   } catch (err) {
     return res.status(500).json({ error: err });
