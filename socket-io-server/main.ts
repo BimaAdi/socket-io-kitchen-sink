@@ -62,7 +62,7 @@ app.post("/api/broadcast/", (req: Request, res: Response) => {
 io.on("connection", (socket) => {
   console.log(`a user connected with socket id ${socket.id}`);
   socket.emit("socketid", socket.id);
-  socket.on("joinRomm", (room: string) => {
+  socket.on("joinRoom", (room: string) => {
     console.log(`user ${socket.id} join room ${room}`);
     socket.join(room);
   });
