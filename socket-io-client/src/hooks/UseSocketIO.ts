@@ -31,7 +31,7 @@ const UseSocketIO = ({
       setIsConnect(true);
 
       if (room !== "") {
-        socket.current?.emit("joinRomm", room);
+        socket.current?.emit("joinRoom", room);
       }
     }
 
