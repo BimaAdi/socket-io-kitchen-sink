@@ -11,6 +11,7 @@ const User = ({
 }) => {
   const { isConnect, socketId, socket, message } = UseSocketIO({
     autoConnect: true,
+    room: room,
   });
 
   const removeAndDisconect = () => {

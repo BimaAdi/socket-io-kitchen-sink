@@ -5,13 +5,20 @@ import "./App.css";
 import { API_URL } from "./constants";
 
 function App() {
-  const [users, setUsers] = useState<{ key: string }[]>([]);
+  const [users, setUsers] = useState<{ key: string; room: string }[]>([]);
+  const [room, setRoom] = useState<string>("");
   const [chatBroadcast, setChatBroadcast] = useState<string>("");
   const [inputSocketId, setInputSocketId] = useState<string>("");
   const [chatSocketId, setChatSocketId] = useState<string>("");
+  const [inputRoom, setInputRoom] = useState<string>("");
+  const [chatRoom, setChatRoom] = useState<string>("");
 
   const addNewUser = () => {
-    setUsers([...users, { key: uuidv4() }]);
+    setUsers([...users, { key: uuidv4(), room: "" }]);
+  };
+
+  const addNewUserToRoom = (room: string) => {
+    setUsers([...users, { key: uuidv4(), room: room }]);
   };
 
   const removeUser = (key: string) => {
@@ -47,6 +54,21 @@ function App() {
     console.log(res.json());
   };
 
+  const toRoomMessage = async (room: string, message: string) => {
+    const res = await fetch(`${API_URL}/api/to-room/`, {
+      method: "POST",
+      headers: {
+        "Content-type": "application/json",
+      },
+      body: JSON.stringify({
+        room,
+        message,
+      }),
+    });
+
+    console.log(res.json());
+  };
+
   return (
     <>
       <h1>Socket IO kitchen sink</h1>
@@ -55,6 +77,17 @@ function App() {
           <h2>Command</h2>
           <div className="bordered" style={{ marginBottom: "10px" }}>
             <button onClick={addNewUser}>Add New User</button>
+          </div>
+          <div className="bordered" style={{ marginBottom: "10px" }}>
+            <input
+              placeholder="room"
+              type="text"
+              value={room}
+              onChange={(e) => setRoom(e.target.value)}
+            />
+            <button onClick={() => addNewUserToRoom(room)}>
+              Add New User to Room
+            </button>
           </div>
           <div className="bordered" style={{ marginBottom: "10px" }}>
             <input
@@ -80,8 +113,27 @@ function App() {
               value={inputSocketId}
               onChange={(e) => setInputSocketId(e.target.value)}
             />
-            <button onClick={() => toSocketIdMessage(inputSocketId, chatSocketId)}>
+            <button
+              onClick={() => toSocketIdMessage(inputSocketId, chatSocketId)}
+            >
               toSocketId
+            </button>
+          </div>
+          <div className="bordered" style={{ marginBottom: "10px" }}>
+            <input
+              placeholder="message"
+              type="text"
+              value={chatRoom}
+              onChange={(e) => setChatRoom(e.target.value)}
+            />
+            <input
+              placeholder="room"
+              type="text"
+              value={inputRoom}
+              onChange={(e) => setInputRoom(e.target.value)}
+            />
+            <button onClick={() => toRoomMessage(inputRoom, chatRoom)}>
+              toRoom
             </button>
           </div>
         </div>
@@ -89,7 +141,14 @@ function App() {
           <h2>Users</h2>
           <div className="users-grid">
             {users.map((x) => {
-              return <User id={x.key} removeUser={removeUser} key={x.key} />;
+              return (
+                <User
+                  id={x.key}
+                  room={x.room}
+                  removeUser={removeUser}
+                  key={x.key}
+                />
+              );
             })}
           </div>
         </div>

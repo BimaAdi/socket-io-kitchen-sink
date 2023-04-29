@@ -12,3 +12,10 @@ export const ToSocketIdMessageValidator = z.object({
 });
 
 export type ToSocketIdMessage = z.infer<typeof ToSocketIdMessageValidator>;
+
+export const ToRoomMessageValidator = z.object({
+  room: z.string(),
+  message: z.string(),
+});
+
+export type ToRoomMessage = z.infer<typeof ToRoomMessageValidator>;

@@ -12,6 +12,7 @@ import {
 import { SocketTypes } from "./types/sockettypes";
 import {
   BroadcastMessageValidator,
+  ToRoomMessageValidator,
   ToSocketIdMessageValidator,
 } from "./validators";
 
@@ -72,6 +73,21 @@ app.post("/api/to-socket-id/", (req: Request, res: Response) => {
     return res.status(500).json({ error: err });
   }
 });
+
+app.post("/api/to-room/", (req: Request, res: Response) => {
+    let io = req.app.get("io") as SocketTypes;
+  
+    try {
+      const validate = ToRoomMessageValidator.safeParse(req.body);
+      if (validate.success === false) {
+        return res.status(400).json({ message: validate.error });
+      }
+      io.in(validate.data.room).emit("message", validate.data.message);
+      return res.status(200).json({ message: "Ok" });
+    } catch (err) {
+      return res.status(500).json({ error: err });
+    }
+  });
 
 io.on("connection", (socket) => {
   console.log(`a user connected with socket id ${socket.id}`);
