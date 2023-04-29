@@ -1,24 +1,17 @@
-import { useEffect } from "react";
 import UseSocketIO from "../hooks/UseSocketIO";
 
 const User = ({
   id,
   removeUser,
-  room = undefined,
+  room = "",
 }: {
   id: string;
   removeUser: (key: string) => void;
   room?: string | undefined;
 }) => {
-  const { isConnect, socketId, socket } = UseSocketIO({ autoConnect: true });
-
-  useEffect(() => {
-    if (isConnect === true) {
-      console.log(`connect to socketio`);
-    } else {
-      console.log(`try to connect socketio`);
-    }
-  }, [isConnect]);
+  const { isConnect, socketId, socket, message } = UseSocketIO({
+    autoConnect: true,
+  });
 
   const removeAndDisconect = () => {
     socket.current?.disconnect();
@@ -27,9 +20,10 @@ const User = ({
 
   return (
     <div className="bordered">
+      <div>status: {isConnect ? "connected" : "disconnected"}</div>
       <div>socket id: {socketId}</div>
       <div>room: {room ? room : ""}</div>
-      <div>receive_message: </div>
+      <div>receive_message: {message}</div>
       <button onClick={removeAndDisconect}>X</button>
     </div>
   );

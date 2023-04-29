@@ -2,9 +2,10 @@ import { useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import User from "./components/User";
 import "./App.css";
+import { API_URL } from "./constants";
 
 function App() {
-  const [chat, setChat] = useState<string>("");
+  const [chatBroadcast, setChatBroadcast] = useState<string>("");
   const [users, setUsers] = useState<{ key: string }[]>([]);
 
   const addNewUser = () => {
@@ -13,6 +14,20 @@ function App() {
 
   const removeUser = (key: string) => {
     setUsers(users.filter((x) => key !== x.key));
+  };
+
+  const broadcastMessage = async (message: string) => {
+    const res = await fetch(`${API_URL}/api/broadcast/`, {
+      method: "POST",
+      headers: {
+        "Content-type": "application/json",
+      },
+      body: JSON.stringify({
+        message,
+      }),
+    });
+
+    console.log(res.json());
   };
 
   return (
@@ -28,10 +43,12 @@ function App() {
             <input
               placeholder="message"
               type="text"
-              value={chat}
-              onChange={(e) => setChat(e.target.value)}
+              value={chatBroadcast}
+              onChange={(e) => setChatBroadcast(e.target.value)}
             />
-            <button>Broadcast</button>
+            <button onClick={() => broadcastMessage(chatBroadcast)}>
+              Broadcast
+            </button>
           </div>
         </div>
         <div className="users">

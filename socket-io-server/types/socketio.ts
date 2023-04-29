@@ -1,10 +1,11 @@
 export interface ServerToClientEvents {
     noArg: () => void;
     socketid: (a: string) => void;
+    message: (message: string) => void;
 }
 
 export interface ClientToServerEvents {
-    hello: () => void;
+    joinRoom: (room: string) => void;
 }
 
 export interface InterServerEvents {
